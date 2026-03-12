@@ -1,0 +1,66 @@
+# =========================
+# Vivado generated files
+# =========================
+*.jou
+*.log
+*.str
+*.pb
+*.wdb
+*.wcfg
+
+# Vivado run directories
+.runs/
+.cache/
+.hw/
+.Xil/
+ip_user_files/
+.sim/
+
+# Vivado temporary files
+*.tmp
+*.backup
+*.orig
+
+# Bitstream outputs (optional - keep if you want reproducible builds)
+*.bit
+*.bin
+
+# =========================
+# Vitis workspace
+# =========================
+.metadata/
+Debug/
+Release/
+build/
+
+# Vitis generated files
+*.elf
+*.map
+*.sdk
+
+# =========================
+# HLS
+# =========================
+solution*/syn/
+solution*/impl/
+solution*/.autopilot/
+solution*/.ipcache/
+solution*/.Xil/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Editors
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Python (if you use scripts for test data)
+# =========================
+__pycache__/
+*.pyc
