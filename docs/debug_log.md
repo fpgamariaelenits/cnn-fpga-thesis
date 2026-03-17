@@ -143,33 +143,7 @@ Possible causes:
   * full CNN inference
 
 ---
-
-## 8. Next Steps
-
-1. Perform manual memory test (XSDB):
-
-   ```tcl
-   mwr 0xC0010000 0x11223344
-   mrd 0xC0010000
-   ```
-
-2. Verify BRAM configuration in Vivado:
-
-   * Address Editor
-   * BRAM size and range
-
-3. Check AXI interconnect:
-
-   * Address decoding
-   * Connectivity
-
-4. Confirm required memory size:
-
-   * Minimum ≥ 0x40000 (256KB)
-
----
-
-## 9. Status
+## 8. Status
 
 | Component              | Status |
 | ---------------------- | ------ |
@@ -181,7 +155,7 @@ Possible causes:
 
 ---
 
-## 10. Conclusion
+## 9. Conclusion
 
 The system successfully passed the **single-layer validation stage**, proving correct accelerator integration.
 
