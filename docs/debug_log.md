@@ -1,202 +1,190 @@
 # Debug Log
 
-## Current Issue: BRAM Access Failure During Pointwise Execution
-
-### Summary
-
-During the transition from a verified **single-layer execution flow** to a more realistic **pointwise CNN layer execution**, a critical issue has been identified related to **BRAM memory access and data visibility**.
-
-Although the accelerator successfully starts and completes execution, the expected data is **not written or read correctly** from specific BRAM regions.
+## Issue: BRAM Access Failure During Pointwise Execution
 
 ---
 
-## Verified Working State (Baseline)
+## 1. Background
 
-Before introducing the pointwise test, the system successfully executed a **single-layer demo**, confirming that the full hardware/software pipeline is functional.
+The system has successfully completed the **single-layer execution phase**, confirming that:
 
-### Confirmed Functional Components
+* MicroBlaze correctly programs AXI-Lite registers
+* The `conv2d_blck` accelerator starts and completes execution
+* AXI master interface is functional
+* BRAM is accessible (at least at base address)
+* Output was correctly produced in a synthetic test
 
-* MicroBlaze successfully programs AXI-Lite control registers
-* `conv2d_blck` accelerator receives configuration and starts execution
-* AXI master interface performs memory transactions
-* BRAM is accessible and readable from software
-* Output buffer was correctly written and validated
+This validated the core pipeline:
 
-### Conclusion
-
-The following pipeline was verified as **fully operational**:
-
+```text
+MicroBlaze → AXI-Lite → Conv2D Accelerator → AXI Master → BRAM
 ```
-MicroBlaze → AXI-Lite → conv2d_blck → AXI Master → BRAM → Output
-```
-
-This confirms that:
-
-* Control path is correct
-* Accelerator integration is correct
-* Memory interface is functional (at least for base region)
 
 ---
 
-## Current Test Scenario
+## 2. Current Test
 
-The system was extended to execute a **tiny pointwise convolution layer** with:
+A **tiny pointwise convolution test** was introduced to move toward real CNN execution.
+
+### Configuration
 
 * Input: 2×2×2 (8 elements)
-* Output: 2×2×2 (2 channels)
-* Filter: 1×1 pointwise (Cout=2, Cin=2)
-* Quantization parameters included (bias, multiplier, shift)
+* Output: 2×2×2
+* Filter: 1×1 (pointwise)
+* Channels: Cin=2, Cout=2
 
-Memory layout:
+### Memory Layout
 
-| Tensor     | Address Range |
-| ---------- | ------------- |
-| Input      | 0xC0000000    |
-| Filter     | 0xC0010000    |
-| Bias       | 0xC0020000    |
-| Multiplier | 0xC0030000    |
-| Shift      | 0xC0034000    |
-| Output     | 0xC0040000    |
+| Tensor     | Address    |
+| ---------- | ---------- |
+| Input      | 0xC0000000 |
+| Filter     | 0xC0010000 |
+| Bias       | 0xC0020000 |
+| Multiplier | 0xC0030000 |
+| Shift      | 0xC0034000 |
+| Output     | 0xC0040000 |
 
 ---
 
-## Observed Behavior
+## 3. Observations
 
-### 1. Control Flow (Correct)
+### 3.1 Accelerator Execution
 
-* `ap_start` is successfully written
+* `ap_start` is triggered
 * `ap_done` is asserted
-* Execution completes without hanging
+* Execution completes normally
 
-➡️ The accelerator **runs successfully**
+✔ Accelerator is running correctly
 
 ---
 
-### 2. Input Memory (Correct)
+### 3.2 Input Memory (Correct)
 
-At address `0xC0000000`:
+Memory at `0xC0000000`:
 
-```
+```text
 01 02 03 04 05 06 07 08
 ```
 
-➡️ Input tensor is correctly written to BRAM
+✔ Input tensor is correctly written
 
 ---
 
-### 3. Other Buffers (Incorrect)
+### 3.3 Other Tensors (Incorrect)
 
-At the following regions:
+Memory at:
 
 * `0xC0010000` (filter)
 * `0xC0020000` (bias)
 * `0xC0030000` (multiplier)
 * `0xC0034000` (shift)
 
-Observed value:
+Observed:
 
-```
-dec0dee3 dec0dee3 dec0dee3 ...
+```text
+dec0dee3 dec0dee3 ...
 ```
 
-➡️ Indicates **uninitialized / unwritten memory**
+❌ Indicates uninitialized memory
 
 ---
 
-### 4. Output Buffer (Incorrect)
+### 3.4 Output Buffer (Incorrect)
 
-At `0xC0040000`:
+Memory at `0xC0040000`:
 
-```
+```text
 dec0dee3 ...
 ```
 
-➡️ Accelerator **did not produce output**
+❌ No output written by accelerator
 
 ---
 
-## Key Observation
+## 4. Key Finding
 
-* Input buffer (offset = 0) is written correctly
-* All other buffers (non-zero offsets) are **not written**
-* Accelerator completes execution but operates on invalid data
-
----
-
-## Root Cause Hypothesis
-
-This behavior strongly suggests a **BRAM address mapping or access issue** beyond the base address.
-
-Possible causes include:
-
-* BRAM address space not fully mapped beyond base region
-* Incorrect address decoding in Vivado block design
-* AXI interconnect not forwarding higher address ranges correctly
-* Memory region size mismatch (e.g., only first segment valid)
-* Software writes to addresses that are not physically backed by BRAM
+* Base address region (`0xC0000000`) is writable
+* Higher offset regions are not reflecting writes
+* Accelerator runs but operates on invalid data
 
 ---
 
-## Supporting Evidence
+## 5. Root Cause Hypothesis
 
-* Manual inspection shows valid data only at base address
-* All higher offsets return debug pattern (`0xdec0dee3`)
-* Accelerator execution completes (no crash or stall)
-* AXI-Lite register configuration is correct
+The issue is likely related to **BRAM address mapping or memory accessibility**.
+
+Possible causes:
+
+* BRAM size smaller than expected
+* Address range not fully mapped in Vivado
+* AXI interconnect not forwarding full address space
+* Incorrect address decoding in block design
+* Memory region partially valid (only base segment)
 
 ---
 
-## Impact
+## 6. Evidence
 
-* Accelerator operates on invalid weights/bias
-* No meaningful computation is performed
-* Prevents transition to:
+* Input region works (offset = 0)
+* All other regions return debug pattern
+* AXI-Lite configuration verified correct
+* Pointer registers verified correct
+* Execution flow verified correct
+
+---
+
+## 7. Impact
+
+* Accelerator reads invalid weights and parameters
+* No valid computation occurs
+* Blocks transition to:
 
   * multi-channel execution
-  * full CNN inference pipeline
+  * full CNN inference
 
 ---
 
-## Next Debug Steps
+## 8. Next Steps
 
-1. Perform manual memory write/read test via XSDB:
+1. Perform manual memory test (XSDB):
 
    ```tcl
    mwr 0xC0010000 0x11223344
    mrd 0xC0010000
    ```
 
-2. Verify BRAM address range in Vivado:
+2. Verify BRAM configuration in Vivado:
 
-   * Check Address Editor
-   * Confirm size and mapping of BRAM controller
+   * Address Editor
+   * BRAM size and range
 
-3. Validate AXI interconnect routing:
+3. Check AXI interconnect:
 
-   * Ensure full address space is reachable
+   * Address decoding
+   * Connectivity
 
-4. Confirm BRAM size vs required offsets:
+4. Confirm required memory size:
 
-   * Required space ≥ 0x40000 (256KB)
-
----
-
-## Status
-
-| Stage                    | Status                 |
-| ------------------------ | ---------------------- |
-| Hardware integration     | ✅ Done                 |
-| AXI-Lite control         | ✅ Done                 |
-| Single-layer execution   | ✅ Verified             |
-| Pointwise execution      | ❌ Blocked (BRAM issue) |
-| CNN multi-layer pipeline | ⏳ Pending              |
+   * Minimum ≥ 0x40000 (256KB)
 
 ---
 
-## Conclusion
+## 9. Status
 
-The system has successfully passed the **single-layer validation phase**, confirming correct integration of the accelerator.
+| Component              | Status |
+| ---------------------- | ------ |
+| AXI-Lite configuration | ✅ OK   |
+| Accelerator execution  | ✅ OK   |
+| Input memory           | ✅ OK   |
+| Other tensors          | ❌ FAIL |
+| Output generation      | ❌ FAIL |
 
-However, the transition to a realistic CNN execution flow is currently blocked due to a **memory access issue affecting BRAM regions beyond the base address**.
+---
 
-This is now the primary blocker before proceeding to full CNN inference.
+## 10. Conclusion
+
+The system successfully passed the **single-layer validation stage**, proving correct accelerator integration.
+
+However, the transition to realistic CNN execution is currently blocked by a **BRAM access issue affecting non-zero offset regions**.
+
+This is the primary blocker before proceeding to full CNN inference.
