@@ -62,14 +62,3 @@ Contains generated hardware artifacts after synthesis & implementation.
 
 - **system_wrapper.xsa**  
   Hardware platform description used by **Vitis**.
-
----
-
-## Recreate the Design
-
-### Option 1 (Recommended – Fully Reproducible)
-
-If `recreate.tcl` is available:
-
-```bash
-vivado -source project/recreate.tcl
