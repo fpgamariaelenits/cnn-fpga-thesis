@@ -1,8 +1,15 @@
 # Vivado Hardware Design
 
-This directory contains the FPGA hardware design of the CNN accelerator system implemented in **Xilinx Vivado**.
+This directory contains the FPGA hardware design of the CNN accelerator system implemented in **Xilinx Vivado 2024.2**.
 
-The design integrates a **MicroBlaze processor**, AXI interconnect infrastructure and a custom **Conv2D hardware accelerator** generated from HLS.
+The design integrates:
+
+- MicroBlaze soft processor
+- AXI interconnect infrastructure
+- BRAM memory system
+- Custom **Conv2D hardware accelerator** generated from HLS
+
+---
 
 ## Folder Structure
 
@@ -18,65 +25,51 @@ vivado
     └── system_wrapper.xsa
 ```
 
-### project/
+---
 
-Contains the minimal sources required to open the hardware project in Vivado.
+## project/
 
-* **conv2d_board.xpr**
-  Vivado project file.
+Contains the minimal sources required to open and rebuild the hardware design.
 
-* **system.bd**
-  Block Design describing the system architecture.
-  It includes the MicroBlaze processor, AXI peripherals, memory system and the hardware accelerator.
+### Files
 
-* **arty_constraints.xdc**
-  FPGA constraint file defining board pins and clock configuration.
+- **conv2d_board.xpr**  
+  Vivado project file (can be used to open the design directly).
 
-### exports/
+- **system.bd**  
+  Block Design describing the system architecture.  
+  Includes:
+  - MicroBlaze processor
+  - AXI interconnect
+  - BRAM controllers
+  - HLS Conv2D accelerator IP
 
-Contains the hardware export files generated after synthesis and implementation.
+- **arty_constraints.xdc**  
+  FPGA constraint file (pins, clocks, board configuration).
 
-* **system_wrapper.bit**
-  FPGA bitstream used to program the FPGA device.
+- **recreate.tcl (recommended)**  
+  TCL script to fully recreate the project in a clean environment.  
+  This is the **preferred reproducible method**.
 
-* **system_wrapper.xsa**
-  Hardware platform description used by **Vitis** to build the software application.
+---
 
-## How to Open the Project
+## exports/
 
-1. Open **Vivado**.
-2. Select **Open Project**.
-3. Navigate to:
+Contains generated hardware artifacts after synthesis & implementation.
 
-```
-vivado/project/conv2d_board.xpr
-```
+- **system_wrapper.bit**  
+  FPGA bitstream used to program the FPGA.
 
-4. Open the project.
+- **system_wrapper.xsa**  
+  Hardware platform description used by **Vitis**.
 
-Vivado may regenerate missing build folders automatically.
+---
 
-## How to Rebuild the Hardware
+## Recreate the Design
 
-After opening the project:
+### Option 1 (Recommended – Fully Reproducible)
 
-1. Validate the block design.
-2. Run **Synthesis**.
-3. Run **Implementation**.
-4. Generate **Bitstream**.
+If `recreate.tcl` is available:
 
-This will recreate the hardware design and regenerate the export files if needed.
-
-## Hardware Export
-
-The generated hardware platform for the software environment is provided as:
-
-```
-vivado/exports/system_wrapper.xsa
-```
-
-This file is used in **Vitis** to create the software platform and run the CNN accelerator application on the MicroBlaze processor.
-
-## Notes
-
-Temporary Vivado build directories (`.runs`, `.gen`, `.cache`, `.Xil`) are intentionally not included in the repository since they are automatically recreated by Vivado.
+```bash
+vivado -source project/recreate.tcl
