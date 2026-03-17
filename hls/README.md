@@ -1,9 +1,10 @@
-# hls
+# HLS - Conv2D Accelerator
 
-HLS implementation of the conv2d accelerator.
+This folder contains the HLS implementation of the Conv2D accelerator.
 
-Planned contents:
-- kernel source
-- headers
-- testbench
-- HLS project notes
+## Structure
+
+- `src/` → kernel source code
+- `test_bench/` → simulation testbench
+
+## Top Function
