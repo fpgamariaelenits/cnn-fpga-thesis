@@ -1,34 +1,29 @@
 # CNN FPGA Thesis
 
-FPGA-based conv2d accelerator thesis project using Vivado, Vitis and HLS.
+This project implements a custom CNN accelerator on FPGA using:
 
-## Overview
+- HLS (Conv2D kernel)
+- Vivado (hardware design)
+- Vitis (software control with MicroBlaze)
 
-This repository contains the hardware, HLS, software, test data, and exported platform files for a CNN/conv2d FPGA implementation.
+## Architecture
 
-## Repository Structure
+HLS → exported as IP → integrated in Vivado → controlled by MicroBlaze via AXI → executed from Vitis
 
-- `docs/` documentation, notes, debug logs, architecture notes
-- `vivado/` Vivado hardware design sources
-- `hls/` HLS kernel implementation
-- `vitis/` Vitis software application and platform-related notes
-- `test_data/` input data, weights, bias, and reference outputs
-- `exports/` exported hardware files such as `.xsa` and optional stable bitstreams
+## Folder Structure
 
-## Current Status
+- `hls/` → HLS kernel and testbench
+- `vivado/` → hardware design (block design, constraints)
+- `vitis/` → application code (MicroBlaze control)
+- `docs/` → notes and debugging logs
 
-- Repository initialized
-- Folder structure created
-- `.gitignore` added for Vivado/Vitis/HLS generated files
+## Requirements
 
-## Next Steps
+- Vivado 2024.2
+- Vitis Unified IDE 2024.2
 
-- Add Vivado project sources
-- Add HLS conv2d source files
-- Add Vitis bare-metal application
-- Add test vectors and reference outputs
-- Export stable `.xsa` from Vivado
+## Quick Start
 
-## Notes
-
-This repository is intended to store source files and essential project artifacts, not generated tool outputs.
+1. Recreate hardware (Vivado)
+2. Import platform in Vitis
+3. Build and run application
