@@ -1,0 +1,6 @@
+
+Family       : artix7
+Device       : xc7a35ti
+Package      : -csg324
+Speed Grade  : -1L
+Clock Period : 10
