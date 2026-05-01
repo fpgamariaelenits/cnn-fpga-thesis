@@ -28,6 +28,55 @@ Create a new workspace.
 ```
 hardware/system_wrapper.xsa
 ```
+### Detailed Vitis Steps (for first-time setup)
+
+#### Create Platform Project
+
+1. Open Vitis
+2. Select **Create Platform Project**
+3. Choose:
+
+   * Platform from hardware (XSA)
+4. Browse and select:
+
+   ```
+   hardware/system_wrapper.xsa
+   ```
+5. Click **Finish**
+
+---
+
+#### Create Application Project
+
+1. Select **Create Application Project**
+2. Choose the platform created above
+3. Select:
+
+   * Template: **Empty Application**
+4. Finish the wizard
+
+---
+
+#### Replace Source Files
+
+1. Open the created application project
+2. Navigate to the `src/` folder
+3. Delete the existing contents
+4. Copy the files from:
+
+   ```
+   software/src/
+   ```
+
+   into the project `src/` folder
+
+---
+
+#### Build & Run
+
+1. Right-click project → **Build Project**
+2. Program FPGA with `.bit`
+3. Right-click → **Run As → Launch on Hardware**
 
 ---
 
