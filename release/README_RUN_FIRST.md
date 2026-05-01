@@ -2,7 +2,15 @@
 
 ## Goal
 
-Verify that the FPGA Conv2D accelerator works end-to-end.
+Verify that the FPGA Conv2D accelerator works end-to-end on hardware.
+
+---
+
+## Requirements
+
+* Vivado 2024.2
+* Vitis Unified IDE 2024.2
+* Digilent Arty A7-35T board
 
 ---
 
@@ -12,9 +20,10 @@ Create a new workspace.
 
 ---
 
-## Step 2 – Create Platform
+## Step 2 – Create Hardware Platform
 
-Import hardware platform from:
+* Select **Create Platform Project**
+* Import hardware from:
 
 ```
 hardware/system_wrapper.xsa
@@ -22,16 +31,22 @@ hardware/system_wrapper.xsa
 
 ---
 
-## Step 3 – Create Application
+## Step 3 – Create Application Project
 
-* Create empty application project
-* Replace the `src/` folder with the provided one
+* Create a new **Empty Application Project**
+* Select the platform created in Step 2
+* Replace the contents of the `src/` folder with:
+
+```
+software/src/main.c
+software/src/tiny_pointwise.h
+```
 
 ---
 
 ## Step 4 – Program FPGA
 
-Use:
+Program the device using:
 
 ```
 hardware/system_wrapper.bit
@@ -39,13 +54,16 @@ hardware/system_wrapper.bit
 
 ---
 
-## Step 5 – Run Application
+## Step 5 – Build and Run
+
+* Build the application
+* Run it on hardware
 
 ---
 
 ## Expected Result
 
-Check memory at:
+After execution, inspect memory at:
 
 ```
 0xC0002000
@@ -61,15 +79,15 @@ Expected values:
 
 ## What this proves
 
-* MicroBlaze is running
-* AXI-Lite configuration works
-* BRAM access works
-* Conv2D accelerator computes correctly
+* MicroBlaze is running correctly
+* AXI-Lite communication with the accelerator works
+* BRAM read/write is functional
+* The Conv2D hardware accelerator produces correct output
 
 ---
 
 ## Notes
 
-This is a verified minimal system.
-More complex CNN layers are under development.
+This is a **verified minimal working baseline**.
 
+More complex CNN layers (e.g., multi-channel / pointwise / depthwise) are under development and may not yet be fully validated.
