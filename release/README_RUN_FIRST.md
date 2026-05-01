@@ -10,7 +10,19 @@ Verify that the FPGA Conv2D accelerator works end-to-end on hardware.
 
 * Vivado 2024.2
 * Vitis Unified IDE 2024.2
-* Digilent Arty A7-35T board
+* Digilent Arty A7-35T board (must be connected)
+
+---
+
+## Overview
+
+You will:
+
+1. Create a hardware platform from the provided `.xsa`
+2. Create an application project in Vitis
+3. Replace the source files with the provided ones
+4. Program the FPGA and run the application
+5. Verify the result in memory
 
 ---
 
@@ -22,34 +34,23 @@ Create a new workspace.
 
 ## Step 2 – Create Hardware Platform
 
-* Select **Create Platform Project**
-* Import hardware from:
+1. Select **Create Platform Project**
+2. Choose:
 
-```
-hardware/system_wrapper.xsa
-```
-### Detailed Vitis Steps (for first-time setup)
-
-#### Create Platform Project
-
-1. Open Vitis
-2. Select **Create Platform Project**
-3. Choose:
-
-   * Platform from hardware (XSA)
-4. Browse and select:
+   * **Platform from hardware (XSA)**
+3. Browse and select:
 
    ```
    hardware/system_wrapper.xsa
    ```
-5. Click **Finish**
+4. Click **Finish**
 
 ---
 
-#### Create Application Project
+## Step 3 – Create Application Project
 
 1. Select **Create Application Project**
-2. Choose the platform created above
+2. Choose the platform created in Step 2
 3. Select:
 
    * Template: **Empty Application**
@@ -57,7 +58,7 @@ hardware/system_wrapper.xsa
 
 ---
 
-#### Replace Source Files
+## Step 4 – Replace Source Files
 
 1. Open the created application project
 2. Navigate to the `src/` folder
@@ -72,28 +73,7 @@ hardware/system_wrapper.xsa
 
 ---
 
-#### Build & Run
-
-1. Right-click project → **Build Project**
-2. Program FPGA with `.bit`
-3. Right-click → **Run As → Launch on Hardware**
-
----
-
-## Step 3 – Create Application Project
-
-* Create a new **Empty Application Project**
-* Select the platform created in Step 2
-* Replace the contents of the `src/` folder with:
-
-```
-software/src/main.c
-software/src/tiny_pointwise.h
-```
-
----
-
-## Step 4 – Program FPGA
+## Step 5 – Program FPGA
 
 Program the device using:
 
@@ -103,10 +83,10 @@ hardware/system_wrapper.bit
 
 ---
 
-## Step 5 – Build and Run
+## Step 6 – Build and Run
 
-* Build the application
-* Run it on hardware
+1. Right-click project → **Build Project**
+2. Right-click → **Run As → Launch on Hardware**
 
 ---
 
