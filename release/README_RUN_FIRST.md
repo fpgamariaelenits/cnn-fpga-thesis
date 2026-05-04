@@ -1,8 +1,11 @@
-# RUN THIS FIRST – Verified Baseline
+# RUN THIS FIRST – Verified Baseline execution guide
 
 ## Goal
 
 Verify that the FPGA Conv2D accelerator works end-to-end on hardware.
+This folder does not recreate the Vivado hardware design from source.
+It provides a verified pre-built hardware baseline using the exported XSA and bitstream.
+Use the provided .bit and .xsa together. Do not regenerate the bitstream unless you rebuild the Vivado project separately.
 
 ---
 
