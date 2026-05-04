@@ -77,9 +77,12 @@ Create a new workspace.
 ---
 ## Step 5 – Program FPGA (REQUIRED)
 In this step you load the hardware design onto the FPGA.
+
 The bitstream file is:
 
-hardware/system_wrapper.bit
+   ```
+   hardware/system_wrapper.bit
+   ```
 
 ### What is this file?
 The `.bit` file is the compiled hardware design that configures the FPGA.
@@ -95,8 +98,10 @@ Xilinx → Program Device
 
 3. In the dialog:
 - Set **Bitstream file** to:
-
-hardware/system_wrapper.bit
+  
+   ```
+   hardware/system_wrapper.bit
+   ```
 
 4. Click:
 
@@ -145,7 +150,7 @@ Window → Show View → Memory
 ### Enter the following values
 
 Address: 0xC0002000
-Length: 0x10
+Length: 16
 
 ---
 ### Expected Memory Content
